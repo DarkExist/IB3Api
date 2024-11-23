@@ -2,6 +2,7 @@
 using IB3Api.App;
 using IB3Api.App.Interfaces.Repository;
 using IB3Api.Core.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,44 +20,156 @@ namespace IB3Api.Infrastructure.Repositories
 			_context = context;
 		}
 
-		public Task<ErrorOr<Success>> AddAsync(Post entity, CancellationToken cancellationToken)
+
+
+		public async Task<ErrorOr<Success>> AddAsync(Post entity, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				_context.Posts.Add(entity);
+				await _context.SaveChangesAsync(cancellationToken);
+				return Result.Success;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error adding the post", ex.Message);
+			}
 		}
 
-		public Task<ErrorOr<Success>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+		public async Task<ErrorOr<Success>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				var errorOrPost = await GetByIdAsync(id, cancellationToken);
+				if (errorOrPost.IsError)
+					return errorOrPost.Errors;
+
+				Post post = errorOrPost.Value;
+				_context.Posts.Remove(post);
+				await _context.SaveChangesAsync(cancellationToken);
+				return Result.Success;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error deleting the post", ex.Message);
+			}
 		}
 
-		public Task<ErrorOr<List<Post>>> GetAllAsync(CancellationToken cancellationToken)
+		public async Task<ErrorOr<List<Post>>> GetAllAsync(CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				return await _context.Posts.ToListAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error getting all post", ex.Message);
+			}
 		}
 
-		public Task<ErrorOr<Post>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+		public async Task<ErrorOr<Post>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				Post post = await _context.Posts.FirstAsync(p => p.Id == id);
+				return post;
+			}
+			catch (Exception ex) 
+			{
+				return Error.Failure("Error while searching", ex.Message);
+			}
 		}
 
-		public Task<ErrorOr<Success>> UpdateAsync(Post entity, CancellationToken cancellationToken)
+		public async Task<ErrorOr<Success>> UpdateAsync(Post updatedPost, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				Guid updatedPostGuid = updatedPost.Id;
+				var errorOrPost = await GetByIdAsync(updatedPostGuid, cancellationToken);
+
+				if (errorOrPost.IsError)
+					return Error.Failure("No post to update. Create new");
+
+				_context.Posts.Update(updatedPost);
+				await _context.SaveChangesAsync(cancellationToken);
+				return Result.Success;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error updating post", ex.Message);
+			}
+
 		}
 
-		public Task<ErrorOr<Success>> UpdateImageByIdAsync(Guid id, string newImage, CancellationToken cancellationToken)
+		public async Task<ErrorOr<Success>> UpdateImageByIdAsync(Guid id, string newImage, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				var errorOrPost = await GetByIdAsync(id, cancellationToken);
+				if (errorOrPost.IsError)
+					return Error.Failure("No post to update. Create new");
+
+				Post newPost = errorOrPost.Value;
+				newPost.Image = newImage;
+
+				var result = await UpdateAsync(newPost, cancellationToken);
+				if (result.IsError)
+					return result.Errors;
+
+				return Result.Success;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error updating post", ex.Message);
+			}
 		}
 
-		public Task<ErrorOr<Success>> UpdateTextByIdAsync(Guid id, string newText, CancellationToken cancellationToken)
+		public async Task<ErrorOr<Success>> UpdateTextByIdAsync(Guid id, string newText, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				var errorOrPost = await GetByIdAsync(id, cancellationToken);
+				if (errorOrPost.IsError)
+					return Error.Failure("No post to update. Create new");
+					
+				Post newPost = errorOrPost.Value;
+				newPost.Text = newText;
+
+				var result = await UpdateAsync(newPost, cancellationToken);
+				
+				if (result.IsError)
+					return result.Errors;
+
+				return Result.Success;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error updating post", ex.Message);
+			}
 		}
 
-		public Task<ErrorOr<Success>> UpdateTitleByIdAsync(Guid id, string newTitle, CancellationToken cancellationToken)
+		public async Task<ErrorOr<Success>> UpdateTitleByIdAsync(Guid id, string newTitle, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				var errorOrPost = await GetByIdAsync(id, cancellationToken);
+				if (errorOrPost.IsError)
+					return Error.Failure("No post to update. Create new");
+
+				Post newPost = errorOrPost.Value;
+				newPost.Title = newTitle;
+
+				var result = await UpdateAsync(newPost, cancellationToken);
+
+				if (result.IsError)
+					return result.Errors;
+
+				return Result.Success;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error updating post", ex.Message);
+			}
 		}
 	}
 }

@@ -4,7 +4,7 @@ using IB3Api.App.Interfaces.Services;
 
 namespace IB3Api.Services
 {
-    public class DiffieHelmanService : IDiffieHelman
+    public class DiffieHelmanService : IDiffieHelmanService
 	{
 		Random random = new Random();
 		public BigInteger GetRandomBigInteger(int bits)
@@ -27,6 +27,75 @@ namespace IB3Api.Services
 			} while (!IsProbablyPrime(prime, 10)); // Проверка на простоту
 
 			return prime;
+		}
+
+		
+
+		public BigInteger FindPrimitiveRoot(BigInteger p)
+		{
+			if (p <= 2)
+			{
+				return 1;
+			}
+
+			BigInteger phi = EilerCalculate(p);
+			List<BigInteger> factors = Factorize(phi);
+
+			for (BigInteger g = 2; g < p; g++)
+			{
+				if (IsPrimitiveRoot(g, p, factors))
+				{
+					return g;
+				}
+			}
+
+			throw new Exception("Первообразный корень не найден.");
+		}
+
+		private List<BigInteger> Factorize(BigInteger n)
+		{
+			List<BigInteger> factors = new List<BigInteger>();
+			BigInteger i = 2;
+
+			while (i * i <= n)
+			{
+				if (n % i == 0)
+				{
+					factors.Add(i);
+					n /= i;
+				}
+				else
+				{
+					i++;
+				}
+			}
+
+			if (n > 1)
+			{
+				factors.Add(n);
+			}
+
+			return factors;
+		}
+		private bool IsPrimitiveRoot(BigInteger g, BigInteger p, List<BigInteger> factors)
+		{
+			BigInteger phi = EilerCalculate(p);
+
+			foreach (BigInteger factor in factors)
+			{
+				// Проверяем g^((p-1)/factor) mod p != 1
+				if (BigInteger.ModPow(g, phi / factor, p) == 1)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		private	BigInteger EilerCalculate(BigInteger n)
+		{
+			return n - 1;
 		}
 
 		// Тест простоты Миллера-Рабина

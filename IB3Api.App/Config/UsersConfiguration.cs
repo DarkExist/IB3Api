@@ -16,6 +16,7 @@ namespace IB3Api.App.Config
 		{
 			builder.ToTable("Users");
 			builder.HasKey(t => t.Id);
+
 			builder.HasMany(u => u.Posts)
 				.WithMany(p => p.Users)
 				.UsingEntity(j => j

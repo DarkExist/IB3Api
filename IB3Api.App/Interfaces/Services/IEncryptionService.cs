@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace IB3Api.App.Interfaces.Services
 {
-    public interface IDiffieHelman
+    public interface IEncryptionService
     {
-        public BigInteger GetRandomBigInteger(int bits);
-        public BigInteger GenerateRandomPrime(int bits);
+        public string Encrypt(string data);
+        public string Decrypt(string encryptedData);
     }
 }

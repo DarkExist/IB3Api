@@ -10,6 +10,6 @@ namespace IB3Api.App.Interfaces.Repository
 {
 	public interface IRoleRepository : IRepository<Role>
 	{
-		Task<ErrorOr<Guid>> GetIdByNameAsync(string Name, CancellationToken cancellationToken);
+		Task<ErrorOr<Role>> GetRoleByNameAsync(string name, CancellationToken cancellationToken);
 	}
 }

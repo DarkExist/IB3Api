@@ -2,6 +2,7 @@
 using IB3Api.App;
 using IB3Api.App.Interfaces.Repository;
 using IB3Api.Core.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,39 +20,83 @@ namespace IB3Api.Infrastructure.Repositories
 			_context = context;
 		}
 
-		public Task<ErrorOr<Success>> AddAsync(User entity, CancellationToken cancellationToken)
+		public async Task<ErrorOr<Success>> AddAsync(User entity, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				_context.Users.Add(entity);
+				await _context.SaveChangesAsync(cancellationToken);
+				return Result.Success;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error adding the user", ex.Message);
+			}
 		}
 
-		public Task<ErrorOr<Success>> AddRoleAsync(Guid id, string role, CancellationToken cancellationToken)
+		public async Task<ErrorOr<Success>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				var errorOrUser = await GetByIdAsync(id, cancellationToken);
+				if (errorOrUser.IsError)
+					return errorOrUser.Errors;
+
+				User user = errorOrUser.Value;
+				_context.Users.Remove(user);
+				await _context.SaveChangesAsync(cancellationToken);
+				return Result.Success;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error deleting the user", ex.Message);
+			}
 		}
 
-		public Task<ErrorOr<Success>> DeleteByIdAsync(Guid id, CancellationToken cancellationToken)
+		
+		public async Task<ErrorOr<List<User>>> GetAllAsync(CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				return await _context.Users.ToListAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error getting all users", ex.Message);
+			}
 		}
 
-		public Task<ErrorOr<Success>> DeleteRoleAsync(Guid id, string role, CancellationToken cancellationToken)
+		public async Task<ErrorOr<User>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				User user = await _context.Users.FirstAsync(p => p.Id == id);
+				return user;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error while searching", ex.Message);
+			}
 		}
 
-		public Task<ErrorOr<List<User>>> GetAllAsync(CancellationToken cancellationToken)
+		public async Task<ErrorOr<Success>> UpdateAsync(User updatedUser, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
-		}
+			try
+			{
+				Guid updatedUserGuid = updatedUser.Id;
+				var errorOrUser = await GetByIdAsync(updatedUserGuid, cancellationToken);
 
-		public Task<ErrorOr<User>> GetByIdAsync(Guid id, CancellationToken cancellationToken)
-		{
-			throw new NotImplementedException();
-		}
+				if (errorOrUser.IsError)
+					return Error.Failure("No user to update. You need to create new");
 
-		public Task<ErrorOr<Success>> UpdateAsync(User entity, CancellationToken cancellationToken)
-		{
-			throw new NotImplementedException();
+				_context.Users.Update(updatedUser);
+				await _context.SaveChangesAsync(cancellationToken);
+				return Result.Success;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error updating user", ex.Message);
+			}
 		}
 	}
 }

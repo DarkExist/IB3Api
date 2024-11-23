@@ -10,7 +10,5 @@ namespace IB3Api.App.Interfaces.Repository
 {
 	public interface IUserRepository : IRepository<User>
 	{
-		public Task<ErrorOr<Success>> AddRoleAsync(Guid id, string role, CancellationToken cancellationToken);
-		public Task<ErrorOr<Success>> DeleteRoleAsync(Guid id, string role, CancellationToken cancellationToken);
 	}
 }

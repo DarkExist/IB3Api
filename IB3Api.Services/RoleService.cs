@@ -21,5 +21,29 @@ namespace IB3Api.Services
 			_roleRepository = roleRepository;
 		}
 
+		public async Task<ErrorOr<Success>> AddRoleAsync(Role role, CancellationToken cancellationToken)
+		{
+			return await _roleRepository.AddAsync(role, cancellationToken);
+		}
+
+		public async Task<ErrorOr<Success>> DeleteRoleByIdAsync(Guid id, CancellationToken cancellationToken)
+		{
+			return await _roleRepository.DeleteByIdAsync(id, cancellationToken);
+		}
+
+		public async Task<ErrorOr<List<Role>>> GetAllRolesAsync(CancellationToken cancellationToken)
+		{
+			return await _roleRepository.GetAllAsync(cancellationToken);
+		}
+
+		public async Task<ErrorOr<Role>> GetRoleByIdAsync(Guid guid, CancellationToken cancellationToken)
+		{
+			return await _roleRepository.GetByIdAsync(guid, cancellationToken);	
+		}
+
+		public async Task<ErrorOr<Role>> GetRoleByNameAsync(string name, CancellationToken cancellationToken)
+		{
+			return await _roleRepository.GetRoleByNameAsync(name, cancellationToken);
+		}
 	}
 }

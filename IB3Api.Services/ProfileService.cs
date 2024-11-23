@@ -21,5 +21,23 @@ namespace IB3Api.Services
 			_profileRepository = profileRepository;
 		}
 
+		public async Task<ErrorOr<Success>> AddProfileDescriptionAsync(Guid profileId, CancellationToken cancellationToken)
+		{
+			Profile profile = new();
+			profile.Id = profileId;
+			profile.Description = "";
+			return await _profileRepository.AddAsync(profile, cancellationToken);
+		}
+
+		public async Task<ErrorOr<Profile>> GetProfileById(Guid profileId, CancellationToken cancellationToken)
+		{
+			return await _profileRepository.GetByIdAsync(profileId, cancellationToken);
+		}
+
+		public async Task<ErrorOr<Success>> UpdateDescriptionAsync(Guid profileId, string description, CancellationToken cancellationToken)
+		{
+			return await _profileRepository.UpdateDescriptionByIdAsync(profileId, description, cancellationToken);
+		}
+
 	}
 }

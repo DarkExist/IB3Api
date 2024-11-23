@@ -9,15 +9,15 @@ using System.Threading.Tasks;
 
 namespace IB3Api.Services
 {
-    public class CookieEncryptorService : IEncryption
+    public class EncryptorService : IEncryptionService
 	{
 		private readonly IConfiguration _config;
 		private readonly byte[] _key;
 
-		public CookieEncryptorService(IConfiguration config) 
+		public EncryptorService(IConfiguration config) 
 		{
 			_config = config;
-			_key = Encoding.UTF8.GetBytes(_config["SecretKey"]);
+			_key = Encoding.UTF8.GetBytes(_config["SecretKey"]!);
 		}
 
 		 
