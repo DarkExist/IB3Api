@@ -10,5 +10,6 @@ namespace IB3Api.App.Interfaces.Repository
 {
 	public interface IUserRepository : IRepository<User>
 	{
+		public Task<ErrorOr<User>> GetByNameAsync(string name, CancellationToken cancellationToken);
 	}
 }

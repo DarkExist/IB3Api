@@ -58,7 +58,7 @@ namespace IB3Api.Infrastructure.Repositories
 		{
 			try
 			{
-				return await _context.Users.ToListAsync(cancellationToken);
+				return await _context.Users.Include(u => u.Roles).ToListAsync(cancellationToken);
 			}
 			catch (Exception ex)
 			{
@@ -70,7 +70,20 @@ namespace IB3Api.Infrastructure.Repositories
 		{
 			try
 			{
-				User user = await _context.Users.FirstAsync(p => p.Id == id);
+				User user = await _context.Users.Include(u => u.Roles).FirstAsync(p => p.Id == id);
+				return user;
+			}
+			catch (Exception ex)
+			{
+				return Error.Failure("Error while searching", ex.Message);
+			}
+		}
+
+		public async Task<ErrorOr<User>> GetByNameAsync(string name, CancellationToken cancellationToken)
+		{
+			try
+			{
+				User user = await _context.Users.Include(u => u.Roles).FirstAsync(p => p.Name == name);
 				return user;
 			}
 			catch (Exception ex)

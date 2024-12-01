@@ -14,9 +14,9 @@ namespace IB3Api.Services
 {
 	public class RoleService : IRoleService
 	{
-		private readonly RoleRepository _roleRepository;
+		private readonly IRoleRepository _roleRepository;
 
-		public RoleService(RoleRepository roleRepository)
+		public RoleService(IRoleRepository roleRepository)
 		{
 			_roleRepository = roleRepository;
 		}

@@ -13,6 +13,7 @@ namespace IB3Api.Services
 	{
 		private readonly IConfiguration _config;
 		private readonly byte[] _key;
+		private SHA256 _sha256 = SHA256.Create();
 
 		public EncryptorService(IConfiguration config) 
 		{
@@ -21,10 +22,16 @@ namespace IB3Api.Services
 		}
 
 		 
-		public string Decrypt(string encryptedData)
+		public string Decrypt(string encryptedData, string? key = null)
 		{
+			byte[] decryptKey;
+			if (key != null)
+				decryptKey = _sha256.ComputeHash(Encoding.UTF8.GetBytes(key));
+			else
+				decryptKey = _key;
+
 			using var aes = Aes.Create();
-			aes.Key = _key;
+			aes.Key = decryptKey;
 			aes.Mode = CipherMode.ECB;
 			aes.Padding = PaddingMode.PKCS7;
 
@@ -32,13 +39,22 @@ namespace IB3Api.Services
 			byte[] ciphertext = Convert.FromBase64String(encryptedData);
 			byte[] plaintext = decryptor.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
 
-			return Encoding.UTF8.GetString(plaintext);
+			string result = Encoding.UTF8.GetString(plaintext);
+			return result;
 		}
 
-		public string Encrypt(string data)
+		public string Encrypt(string data, string? key = null)
 		{
+			byte[] decryptKey;
+			if (key != null)
+			{
+				decryptKey = _sha256.ComputeHash(Encoding.UTF8.GetBytes(key));
+			}
+			else
+				decryptKey = _key;
+
 			using var aes = Aes.Create();
-			aes.Key = _key;
+			aes.Key = decryptKey;
 			aes.Mode = CipherMode.ECB;
 			aes.Padding = PaddingMode.PKCS7;
 

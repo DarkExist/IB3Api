@@ -1,4 +1,8 @@
 
+using IB3Api.Api;
+using IB3Api.App;
+using Microsoft.EntityFrameworkCore;
+
 namespace IB3Api
 {
 	public class Program
@@ -14,6 +18,32 @@ namespace IB3Api
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 
+			string connection = builder.Configuration.GetConnectionString("Connection");
+
+			builder.Services.AddDbContext<ApplicationContext>(options =>
+				options.UseNpgsql(connection));
+			builder.Services.AddServices();
+
+			builder.Services.AddCors(options =>
+			{
+				options.AddPolicy("AllowSpecificOrigins",
+					policy =>
+					{
+						policy.WithOrigins("http://127.0.0.1:5500") // Укажите адрес клиента
+							  .AllowAnyHeader()
+							  .AllowAnyMethod()
+							  .AllowCredentials()
+							  .WithMethods("GET", "POST")
+							  .WithOrigins("http://localhost:5500") // Укажите адрес клиента
+							  .AllowAnyHeader()
+							  .AllowAnyMethod()
+							  .AllowCredentials()
+							  .WithMethods("GET", "POST");
+					});
+			});
+
+
+
 			var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
@@ -22,12 +52,7 @@ namespace IB3Api
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
-
-			app.UseHttpsRedirection();
-
-			app.UseAuthorization();
-
-
+			app.UseCors("AllowSpecificOrigins");
 			app.MapControllers();
 
 			app.Run();

@@ -14,9 +14,9 @@ namespace IB3Api.Services
 {
 	public class PostService : IPostService
 	{
-		private readonly PostRepository _postRepository;
+		private readonly IPostRepository _postRepository;
 
-		public PostService(PostRepository postRepositor)
+		public PostService(IPostRepository postRepositor)
 		{
 			_postRepository = postRepositor;
 		}
@@ -67,6 +67,11 @@ namespace IB3Api.Services
 
 			Post post = errorOrPost.Value;
 			return post.CreatorId;
+		}
+
+		public async Task<ErrorOr<Success>> UpdatePostAsync(Post post, CancellationToken cancellationToken)
+		{
+			return await _postRepository.UpdateAsync(post, cancellationToken);
 		}
 	}
 }

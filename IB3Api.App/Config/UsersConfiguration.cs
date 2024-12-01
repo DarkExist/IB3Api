@@ -27,8 +27,9 @@ namespace IB3Api.App.Config
 				.UsingEntity(j => j
 				.ToTable("UsersRoles"));
 
-			builder.HasOne(u => u.ProfileRef)
-				.WithOne(p => p.UserRef);
+			builder.HasOne(u => u.Profile)
+				.WithOne(p => p.User)
+				.HasForeignKey<Profile>(p => p.UserId);
 		}
 	}
 }

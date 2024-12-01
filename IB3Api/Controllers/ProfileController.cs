@@ -5,13 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IB3Api.Api.Controllers
 {
+	[ApiController]
+	[Route("api/[controller]")]
 	public class ProfileController : ControllerBase
 	{
-		private readonly ILogger<LoginController> _logger;
+		private readonly ILogger<AuthController> _logger;
 		private readonly IProfileService _profileService;
 		private readonly IUserService _userService;
 
-		public ProfileController(ILogger<LoginController> logger,
+		public ProfileController(ILogger<AuthController> logger,
 			IProfileService profileService,
 			IUserService userService)
 		{
@@ -63,7 +65,7 @@ namespace IB3Api.Api.Controllers
 			if (errorOrProfile.IsError)
 				return BadRequest(errorOrProfile);
 
-			await _profileService.UpdateDescriptionAsync(userGuid, newDescription, CancellationToken.None)
+			await _profileService.UpdateDescriptionAsync(userGuid, newDescription, CancellationToken.None);
 
 			return Ok();
 		}

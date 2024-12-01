@@ -14,10 +14,10 @@ namespace IB3Api.Services
 {
 	public class UserService : IUserService
 	{
-		private readonly UserRepository _userRepository;
-		private readonly RoleRepository _roleRepository;
+		private readonly IUserRepository _userRepository;
+		private readonly IRoleRepository _roleRepository;
 
-		public UserService(UserRepository userRepository, RoleRepository roleRepository)
+		public UserService(IUserRepository userRepository, IRoleRepository roleRepository)
 		{
 			_userRepository = userRepository;
 			_roleRepository = roleRepository;
@@ -88,7 +88,7 @@ namespace IB3Api.Services
 
 		public async Task<ErrorOr<User>> GetUserByNameAsync(string name, CancellationToken cancellationToken)
 		{
-			return await GetUserByNameAsync(name, cancellationToken);
+			return await _userRepository.GetByNameAsync(name, cancellationToken);
 		}
 
 		public async Task<ErrorOr<Success>> UpdateUser(User user, CancellationToken cancellationToken)

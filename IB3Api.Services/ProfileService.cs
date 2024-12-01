@@ -14,9 +14,9 @@ namespace IB3Api.Services
 {
 	public class ProfileService : IProfileService
 	{
-		private readonly ProfileRepository _profileRepository;
+		private readonly IProfileRepository _profileRepository;
 
-		public ProfileService(ProfileRepository profileRepository)
+		public ProfileService(IProfileRepository profileRepository)
 		{
 			_profileRepository = profileRepository;
 		}

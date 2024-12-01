@@ -90,7 +90,11 @@ namespace IB3Api.Infrastructure.Repositories
 				if (errorOrPost.IsError)
 					return Error.Failure("No post to update. Create new");
 
-				_context.Posts.Update(updatedPost);
+				Post existingPost = errorOrPost.Value;
+				existingPost.Title = updatedPost.Title;
+				existingPost.Text = updatedPost.Text;
+				existingPost.Image = updatedPost.Image;
+				
 				await _context.SaveChangesAsync(cancellationToken);
 				return Result.Success;
 			}

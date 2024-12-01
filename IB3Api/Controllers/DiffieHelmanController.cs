@@ -2,31 +2,33 @@
 using IB3Api.Controllers;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Numerics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace IB3Api.Api.Controllers
 {
 	[ApiController]
-	[Route("[controller]")]
+	[Route("api/[controller]")]
 	public class DiffieHelmanController : ControllerBase
 	{
-		private readonly ILogger<WeatherForecastController> _logger;
+		private readonly ILogger<DiffieHelmanController> _logger;
 		private readonly IDiffieHelmanService _diffieHelmanService;
 
-		public DiffieHelmanController(ILogger<WeatherForecastController> logger,
+		public DiffieHelmanController(ILogger<DiffieHelmanController> logger,
 			IDiffieHelmanService diffieHelmanService)
 		{
 			_logger = logger;
 			_diffieHelmanService = diffieHelmanService;
 		}
 
-		[HttpGet(Name = "GetSecretKey")]
-		public async Task<ActionResult<Tuple<BigInteger, BigInteger, BigInteger>>> GetSecretKey()
+		[HttpGet]
+		public async Task<ActionResult<string>> GetSecretKey()
 		{
-			BigInteger p = _diffieHelmanService.GenerateRandomPrime(64);
+			BigInteger p = _diffieHelmanService.GenerateRandomPrime(54);
 			BigInteger g = _diffieHelmanService.FindPrimitiveRoot(p);
-			BigInteger a = _diffieHelmanService.GetRandomBigInteger(64);
+			BigInteger a = _diffieHelmanService.GetRandomBigInteger(54);
 			BigInteger A = BigInteger.ModPow(g, a, p);
 
 
@@ -36,14 +38,27 @@ namespace IB3Api.Api.Controllers
 			Tuple<BigInteger, BigInteger> value = Tuple.Create(a, BigInteger.Zero);
 
 			DataHolder.SecurityKeysHolder[key] = value;
-
-			return Ok(Tuple.Create(g, p, A));
+			
+			return Ok(JsonConvert.SerializeObject(Tuple.Create(p, g, A)));
 		}
 
 
-		[HttpGet(Name = "GetSecretKey")]
-		public ActionResult GetSecretKey(BigInteger p, BigInteger g, BigInteger A, BigInteger B)
+		[HttpPost]
+		public ActionResult GetSecretKey([FromBody] Dictionary<string, string> data)
 		{
+			BigInteger p, g, A, B;
+			try
+			{
+				p = BigInteger.Parse(data["p"]);
+				g = BigInteger.Parse(data["g"]);
+				A = BigInteger.Parse(data["A"]);
+				B = BigInteger.Parse(data["B"]);
+			}
+			catch
+			{
+				return BadRequest("Wrong format");
+			}
+
 			Tuple<BigInteger, BigInteger, BigInteger, BigInteger> keyOld =
 				Tuple.Create(p, g, A, BigInteger.Zero);
 
@@ -64,6 +79,7 @@ namespace IB3Api.Api.Controllers
 			DataHolder.SecurityKeysHolder.TryRemove(keyOld,
 				out Tuple<BigInteger, BigInteger> removedItem);
 
+			_logger.LogDebug($"Created secret key {secret}");
 			return Ok();
 		}
 

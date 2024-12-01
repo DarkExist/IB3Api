@@ -13,6 +13,7 @@ namespace IB3Api.App.Interfaces.Services
 		public Task<ErrorOr<Success>> UpdatePostTitleAsync(Guid postId, string newTitle, CancellationToken cancellationToken);
 		public Task<ErrorOr<Success>> UpdatePostTextAsync(Guid postId, string newText, CancellationToken cancellationToken);
 		public Task<ErrorOr<Success>> UpdatePostImageAsync(Guid postId, string newImage, CancellationToken cancellationToken);
+		public Task<ErrorOr<Success>> UpdatePostAsync(Post post, CancellationToken cancellationToken);
 		public Task<ErrorOr<Success>> DeletePostByIdAsync(Guid postId, CancellationToken cancellationToken);
 		public Task<ErrorOr<Success>> AddPostAsync(Post post, CancellationToken cancellationToken);
 		public Task<ErrorOr<List<Post>>> GetAllPostsAsync(CancellationToken cancellationToken);
