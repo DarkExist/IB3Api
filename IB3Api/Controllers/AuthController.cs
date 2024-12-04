@@ -12,6 +12,8 @@ using ErrorOr;
 using System.Text.RegularExpressions;
 using IB3Api.App.Models.CustomClaim;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace IB3Api.Controllers
 {
@@ -22,6 +24,7 @@ namespace IB3Api.Controllers
 		private readonly ILogger<AuthController> _logger;
 		private readonly IUserService _userService;
 		private readonly IEncryptionService _encryptionService;
+		private readonly SHA256 sha256 = SHA256.Create();
 
 		public AuthController(ILogger<AuthController> logger,
 			IUserService userService,
@@ -70,8 +73,7 @@ namespace IB3Api.Controllers
 
 
 			username = registerDTO.Username;
-			password = registerDTO.Password;
-
+			password = BitConverter.ToString(sha256.ComputeHash(Encoding.UTF32.GetBytes(registerDTO.Password))).Replace("-", "").ToLower(); //hash
 			var errorOrUser = await _userService.GetUserByNameAsync(username, CancellationToken.None);
 			if (!errorOrUser.IsError)
 				return StatusCode(398, Error.Failure("Username taken"));
@@ -131,7 +133,7 @@ namespace IB3Api.Controllers
 			}
 
 			username = loginDTO.Username;
-			password = loginDTO.Password;
+			password = BitConverter.ToString(sha256.ComputeHash(Encoding.UTF32.GetBytes(loginDTO.Password))).Replace("-", "").ToLower();
 
 			var errorOrUser = await _userService.GetUserByNameAsync(username, CancellationToken.None);
 			if (errorOrUser.IsError)
